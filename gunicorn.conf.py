@@ -1,7 +1,7 @@
-import multiprocessing
+import os
 
 # Server Socket
-bind = "0.0.0.0:10000"  # Renderのデフォルトポート
+bind = "0.0.0.0:10000"
 workers = 1
 worker_class = "sync"
 timeout = 300
