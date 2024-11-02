@@ -1,29 +1,22 @@
-# ベースイメージとして Python 3.10 の軽量バージョンを使用
-FROM python:3.10-slim
+FROM python:3.11-slim
 
-# システムの依存関係をインストール
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
     build-essential \
     python3-dev \
-    libglib2.0-0 \
-    libsm6 \
-    libxext6 \
-    libxrender-dev \
-    libgl1-mesa-glx \
     && rm -rf /var/lib/apt/lists/*
 
-# 作業ディレクトリを設定
+# Set working directory
 WORKDIR /app
 
-# 依存関係のファイルをコンテナにコピー
+# Copy requirements file
 COPY requirements.txt /app/
 
-# pipをアップグレードし、依存関係をインストール
-RUN pip install --upgrade pip
+# Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# 残りのファイルをコンテナにコピー
+# Copy application code
 COPY . /app
 
-# アプリケーションを実行するコマンドを指定
+# Command to run the application
 CMD ["python", "app.py"]
