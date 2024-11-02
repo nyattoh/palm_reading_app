@@ -1,6 +1,6 @@
 Flask==2.1.1
-opencv-python==4.5.3.56
-numpy==1.24.0
+numpy==1.22.4  # Python 3.10との互換性が確認されているバージョン
+opencv-python==4.8.0.76
 werkzeug==2.1.1
 altgraph==0.17.4
 annotated-types==0.7.0
