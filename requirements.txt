@@ -2,7 +2,7 @@
 Flask==2.1.1
 # Image Processing
 opencv-python-headless==4.8.0.76  # Use headless version for Render
-numpy==1.22.4
+numpy==1.23.5
 # Dependencies
 werkzeug==2.1.1
 altgraph==0.17.4
