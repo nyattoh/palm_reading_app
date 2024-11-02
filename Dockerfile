@@ -1,5 +1,5 @@
 # ベースイメージとして Python 3.11 の軽量バージョンを使用
-FROM python:3.11-slim
+FROM python:3.10-slim
 
 # 作業ディレクトリを設定
 WORKDIR /app
