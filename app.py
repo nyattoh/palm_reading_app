@@ -6,22 +6,22 @@ import numpy as np
 import json
 import uuid
 
-# FlaskƒAƒvƒŠƒP[ƒVƒ‡ƒ“‚Ìİ’è
+# Flaskã‚¢ãƒ—ãƒªã‚±ãƒ¼ã‚·ãƒ§ãƒ³ã®è¨­å®š
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'uploads/'
 app.config['SHARE_FOLDER'] = 'shared/'
 
-# ƒAƒbƒvƒ[ƒh‚³‚ê‚½‰æ‘œ‚Ì‹–‰Â‚³‚ê‚½Šg’£q
+# ã‚¢ãƒƒãƒ—ãƒ­ãƒ¼ãƒ‰ã•ã‚ŒãŸç”»åƒã®è¨±å¯ã•ã‚ŒãŸæ‹¡å¼µå­
 def allowed_file(filename):
     ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-# ƒgƒbƒvƒy[ƒW
+# ãƒˆãƒƒãƒ—ãƒšãƒ¼ã‚¸
 @app.route('/')
 def index():
     return render_template('index.html')
 
-# ‰æ‘œƒAƒbƒvƒ[ƒhˆ—
+# ç”»åƒã‚¢ãƒƒãƒ—ãƒ­ãƒ¼ãƒ‰å‡¦ç†
 @app.route('/upload', methods=['POST'])
 def upload():
     if 'file' not in request.files:
@@ -33,7 +33,7 @@ def upload():
         filename = secure_filename(file.filename)
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         file.save(filepath)
-        # ‰æ‘œˆ—‚ğs‚¤ŠÖ”‚ğŒÄ‚Ño‚µ
+        # ç”»åƒå‡¦ç†ã‚’è¡Œã†é–¢æ•°ã‚’å‘¼ã³å‡ºã—
         result, annotated_image_path = analyze_palm(filepath)
         share_id = str(uuid.uuid4())
         shared_filepath = os.path.join(app.config['SHARE_FOLDER'], f'{share_id}.json')
@@ -42,28 +42,28 @@ def upload():
         return render_template('result.html', result=json.loads(result), annotated_image=annotated_image_path, share_link=url_for('share', share_id=share_id, _external=True))
     return redirect(url_for('index'))
 
-# ‹¤—LƒŠƒ“ƒN‚ÅŒ‹‰Ê‚ğ•\¦
+# å…±æœ‰ãƒªãƒ³ã‚¯ã§çµæœã‚’è¡¨ç¤º
 @app.route('/share/<share_id>', methods=['GET'])
 def share(share_id):
     shared_filepath = os.path.join(app.config['SHARE_FOLDER'], f'{share_id}.json')
     if not os.path.exists(shared_filepath):
-        return "‹¤—L‚³‚ê‚½Œ‹‰Ê‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñB", 404
+        return "å…±æœ‰ã•ã‚ŒãŸçµæœãŒè¦‹ã¤ã‹ã‚Šã¾ã›ã‚“ã€‚", 404
     with open(shared_filepath, 'r', encoding='utf-8') as f:
         result = json.load(f)
     return render_template('shared_result.html', result=result)
 
-# è‚Ì‚Ğ‚ç‚Ì‰æ‘œ‚ğ‰ğÍ‚·‚éŠÖ”
+# æ‰‹ã®ã²ã‚‰ã®ç”»åƒã‚’è§£æã™ã‚‹é–¢æ•°
 def analyze_palm(image_path):
-    # OpenCV‚Å‰æ‘œ‚ğ“Ç‚İ‚İ
+    # OpenCVã§ç”»åƒã‚’èª­ã¿è¾¼ã¿
     img = cv2.imread(image_path)
     if img is None:
-        return "‰æ‘œ‚Ì“Ç‚İ‚İ‚É¸”s‚µ‚Ü‚µ‚½B", None
+        return "ç”»åƒã®èª­ã¿è¾¼ã¿ã«å¤±æ•—ã—ã¾ã—ãŸã€‚", None
     
-    # ‚±‚±‚Å‰æ‘œˆ—‚âè‘Š‚Ìƒ‰ƒCƒ“ŒŸo‚ğs‚¤
+    # ã“ã“ã§ç”»åƒå‡¦ç†ã‚„æ‰‹ç›¸ã®ãƒ©ã‚¤ãƒ³æ¤œå‡ºã‚’è¡Œã†
     detected_lines = detect_lines(img)
     detected_marks = detect_marks_and_mounds(img)
     
-    # è‘Š‚Ì5‚Â‚Ì‹“_‚©‚ç‚Ì‰ğÍŒ‹‰Ê‚ğæ“¾
+    # æ‰‹ç›¸ã®5ã¤ã®è¦–ç‚¹ã‹ã‚‰ã®è§£æçµæœã‚’å–å¾—
     indian_result = analyze_indian_palmistry(detected_lines)
     western_result = analyze_western_palmistry(detected_lines)
     japanese_result = analyze_japanese_palmistry(detected_lines)
@@ -71,26 +71,26 @@ def analyze_palm(image_path):
     love_result = analyze_love_palmistry(detected_lines)
     relationship_result = analyze_relationship_palmistry(detected_lines)
     
-    # ‰ğß‚ğ“‡‚µA—Ç‚¢”»’f‚ğ—Dæ
+    # è§£é‡ˆã‚’çµ±åˆã—ã€è‰¯ã„åˆ¤æ–­ã‚’å„ªå…ˆ
     consolidated_result = consolidate_results([indian_result, western_result, japanese_result, fortune_result, love_result, relationship_result])
 
-    # ü‚Æˆó‚Ì•`‰æŒ‹‰Ê‚ğ•Û‘¶
+    # ç·šã¨å°ã®æç”»çµæœã‚’ä¿å­˜
     annotated_image_path = os.path.join(app.config['UPLOAD_FOLDER'], 'annotated_palm.png')
     cv2.imwrite(annotated_image_path, img)
     
     return consolidated_result, 'uploads/annotated_palm.png'
 
-# ü‚ğŒŸo‚µ‚Ä•`‰æ‚·‚éŠÖ”
+# ç·šã‚’æ¤œå‡ºã—ã¦æç”»ã™ã‚‹é–¢æ•°
 def detect_lines(image):
-    # ‰æ‘œ‚Ì‘Oˆ—iƒOƒŒ[ƒXƒP[ƒ‹•ÏŠ·A‚Ú‚©‚µAƒGƒbƒWŒŸo‚È‚Çj
+    # ç”»åƒã®å‰å‡¦ç†ï¼ˆã‚°ãƒ¬ãƒ¼ã‚¹ã‚±ãƒ¼ãƒ«å¤‰æ›ã€ã¼ã‹ã—ã€ã‚¨ãƒƒã‚¸æ¤œå‡ºãªã©ï¼‰
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     blurred = cv2.GaussianBlur(gray, (5, 5), 0)
     edges = cv2.Canny(blurred, 50, 150)
     
-    # ƒ‰ƒCƒ“ŒŸoiHough•ÏŠ·‚ğg—pj
+    # ãƒ©ã‚¤ãƒ³æ¤œå‡ºï¼ˆHoughå¤‰æ›ã‚’ä½¿ç”¨ï¼‰
     lines = cv2.HoughLinesP(edges, 1, np.pi / 180, threshold=100, minLineLength=50, maxLineGap=10)
     
-    # ŒŸo‚³‚ê‚½ƒ‰ƒCƒ“‚ğ‰æ‘œ‚ÉF•ª‚¯‚µ‚Ä•`‰æ
+    # æ¤œå‡ºã•ã‚ŒãŸãƒ©ã‚¤ãƒ³ã‚’ç”»åƒã«è‰²åˆ†ã‘ã—ã¦æç”»
     if lines is not None:
         colors = [(255, 0, 0), (0, 255, 0), (0, 0, 255), (255, 255, 0), (0, 255, 255)]
         for idx, line in enumerate(lines):
@@ -99,123 +99,123 @@ def detect_lines(image):
                 cv2.line(image, (x1, y1), (x2, y2), color, 2)
     return lines
 
-# ‹u‚âˆó‚ğŒŸo‚·‚éŠÖ”
+# ä¸˜ã‚„å°ã‚’æ¤œå‡ºã™ã‚‹é–¢æ•°
 def detect_marks_and_mounds(image):
-    # ‰¼‚ÌÀ‘•F«—ˆ“I‚É“Á’è‚Ìƒpƒ^[ƒ“”F¯‚ğ’Ç‰Á‚·‚é
-    # ‚±‚±‚Å‹u‚âˆóiƒXƒ^[AƒNƒƒXAƒgƒ‰ƒCƒAƒ“ƒOƒ‹‚È‚Çj‚ğŒŸo‚µ‚Ä‰ğÍ‚ğs‚¤
+    # ä»®ã®å®Ÿè£…ï¼šå°†æ¥çš„ã«ç‰¹å®šã®ãƒ‘ã‚¿ãƒ¼ãƒ³èªè­˜ã‚’è¿½åŠ ã™ã‚‹
+    # ã“ã“ã§ä¸˜ã‚„å°ï¼ˆã‚¹ã‚¿ãƒ¼ã€ã‚¯ãƒ­ã‚¹ã€ãƒˆãƒ©ã‚¤ã‚¢ãƒ³ã‚°ãƒ«ãªã©ï¼‰ã‚’æ¤œå‡ºã—ã¦è§£æã‚’è¡Œã†
     return []
 
-# Še’nˆæ‚Ìè‘ŠŠw‚Ì‰ğß‚ğ“‡‚·‚éŠÖ”
+# å„åœ°åŸŸã®æ‰‹ç›¸å­¦ã®è§£é‡ˆã‚’çµ±åˆã™ã‚‹é–¢æ•°
 def consolidate_results(results):
     consolidated = {}
     for result in results:
         for line, interpretation in json.loads(result).items():
-            if line not in consolidated or "ˆ«‚¢”»’f" in consolidated[line]:
+            if line not in consolidated or "æ‚ªã„åˆ¤æ–­" in consolidated[line]:
                 consolidated[line] = interpretation
     return json.dumps(consolidated, ensure_ascii=False, indent=2)
 
-# ƒCƒ“ƒhè‘ŠŠw‚ÉŠî‚Ã‚­‰ğÍ
+# ã‚¤ãƒ³ãƒ‰æ‰‹ç›¸å­¦ã«åŸºã¥ãè§£æ
 def analyze_indian_palmistry(lines):
     if lines is None:
-        return json.dumps({"message": "ü‚ªŒŸo‚³‚ê‚Ü‚¹‚ñ‚Å‚µ‚½B"}, ensure_ascii=False)
-    # ƒ‰ƒCƒ“‚²‚Æ‚ÉƒCƒ“ƒhè‘ŠŠw‚Ì“Á’¥‚ğ“K—p
+        return json.dumps({"message": "ç·šãŒæ¤œå‡ºã•ã‚Œã¾ã›ã‚“ã§ã—ãŸã€‚"}, ensure_ascii=False)
+    # ãƒ©ã‚¤ãƒ³ã”ã¨ã«ã‚¤ãƒ³ãƒ‰æ‰‹ç›¸å­¦ã®ç‰¹å¾´ã‚’é©ç”¨
     analysis = {}
     for line in lines:
         for x1, y1, x2, y2 in line:
-            # ü‚Ì’·‚³‚âŠp“x‚ÉŠî‚Ã‚¢‚Ä‰ğß‚ğ’Ç‰Á
+            # ç·šã®é•·ã•ã‚„è§’åº¦ã«åŸºã¥ã„ã¦è§£é‡ˆã‚’è¿½åŠ 
             length = np.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
             if length > 100:
-                analysis[f"line_{x1}_{y1}_{x2}_{y2}"] = "’·‚¢¶–½ü: Œ’N‚Æ’·õ‚ğ¦´‚µ‚Ü‚·B"
+                analysis[f"line_{x1}_{y1}_{x2}_{y2}"] = "é•·ã„ç”Ÿå‘½ç·š: å¥åº·ã¨é•·å¯¿ã‚’ç¤ºå”†ã—ã¾ã™ã€‚"
             else:
-                analysis[f"line_{x1}_{y1}_{x2}_{y2}"] = "’Z‚¢¶–½ü: Œ’N–Ê‚É’ˆÓ‚ª•K—v‚Å‚·B"
+                analysis[f"line_{x1}_{y1}_{x2}_{y2}"] = "çŸ­ã„ç”Ÿå‘½ç·š: å¥åº·é¢ã«æ³¨æ„ãŒå¿…è¦ã§ã™ã€‚"
     return json.dumps(analysis, ensure_ascii=False)
 
-# ¼—mè‘ŠŠw‚ÉŠî‚Ã‚­‰ğÍ
+# è¥¿æ´‹æ‰‹ç›¸å­¦ã«åŸºã¥ãè§£æ
 def analyze_western_palmistry(lines):
     if lines is None:
-        return json.dumps({"message": "ü‚ªŒŸo‚³‚ê‚Ü‚¹‚ñ‚Å‚µ‚½B"}, ensure_ascii=False)
-    # ƒ‰ƒCƒ“‚ÌŒ`ó‚âˆÊ’u‚©‚ç¼—mè‘ŠŠw“I‚É‰ğß
+        return json.dumps({"message": "ç·šãŒæ¤œå‡ºã•ã‚Œã¾ã›ã‚“ã§ã—ãŸã€‚"}, ensure_ascii=False)
+    # ãƒ©ã‚¤ãƒ³ã®å½¢çŠ¶ã‚„ä½ç½®ã‹ã‚‰è¥¿æ´‹æ‰‹ç›¸å­¦çš„ã«è§£é‡ˆ
     analysis = {}
     for line in lines:
         for x1, y1, x2, y2 in line:
             length = np.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
             if y1 < y2:
-                analysis[f"line_{x1}_{y1}_{x2}_{y2}"] = "Š´îü: Š´î‚ª–L‚©‚ÅˆÀ’è‚µ‚Ä‚¢‚é‚±‚Æ‚ğ¦‚µ‚Ü‚·B"
+                analysis[f"line_{x1}_{y1}_{x2}_{y2}"] = "æ„Ÿæƒ…ç·š: æ„Ÿæƒ…ãŒè±Šã‹ã§å®‰å®šã—ã¦ã„ã‚‹ã“ã¨ã‚’ç¤ºã—ã¾ã™ã€‚"
             else:
-                analysis[f"line_{x1}_{y1}_{x2}_{y2}"] = "Š´îü: Š´î‚Ì”g‚ªŒƒ‚µ‚¢‰Â”\«‚ª‚ ‚è‚Ü‚·B"
+                analysis[f"line_{x1}_{y1}_{x2}_{y2}"] = "æ„Ÿæƒ…ç·š: æ„Ÿæƒ…ã®æ³¢ãŒæ¿€ã—ã„å¯èƒ½æ€§ãŒã‚ã‚Šã¾ã™ã€‚"
     return json.dumps(analysis, ensure_ascii=False)
 
-# “ú–{è‘ŠŠw‚ÉŠî‚Ã‚­‰ğÍ
+# æ—¥æœ¬æ‰‹ç›¸å­¦ã«åŸºã¥ãè§£æ
 def analyze_japanese_palmistry(lines):
     if lines is None:
-        return json.dumps({"message": "ü‚ªŒŸo‚³‚ê‚Ü‚¹‚ñ‚Å‚µ‚½B"}, ensure_ascii=False)
+        return json.dumps({"message": "ç·šãŒæ¤œå‡ºã•ã‚Œã¾ã›ã‚“ã§ã—ãŸã€‚"}, ensure_ascii=False)
     analysis = {}
     for line in lines:
         for x1, y1, x2, y2 in line:
             if x1 < image.shape[1] // 2:
-                analysis[f"line_{x1}_{y1}_{x2}_{y2}"] = "‰Æ’ë‰^‚ÉŠÖ‚·‚éü: ‰Æ‘°ŠÖŒW‚ªd—v‚Å‚·B"
+                analysis[f"line_{x1}_{y1}_{x2}_{y2}"] = "å®¶åº­é‹ã«é–¢ã™ã‚‹ç·š: å®¶æ—é–¢ä¿‚ãŒé‡è¦ã§ã™ã€‚"
             else:
-                analysis[f"line_{x1}_{y1}_{x2}_{y2}"] = "d–‰^‚ÉŠÖ‚·‚éü: d–‚É‚¨‚¯‚é¬Œ÷‚ğ¦´‚µ‚Ü‚·B"
+                analysis[f"line_{x1}_{y1}_{x2}_{y2}"] = "ä»•äº‹é‹ã«é–¢ã™ã‚‹ç·š: ä»•äº‹ã«ãŠã‘ã‚‹æˆåŠŸã‚’ç¤ºå”†ã—ã¾ã™ã€‚"
     return json.dumps(analysis, ensure_ascii=False)
 
-# à‰^‚ÉŠî‚Ã‚­‰ğÍ
+# è²¡é‹ã«åŸºã¥ãè§£æ
 def analyze_financial_palmistry(lines):
     if lines is None:
-        return json.dumps({"message": "ü‚ªŒŸo‚³‚ê‚Ü‚¹‚ñ‚Å‚µ‚½B"}, ensure_ascii=False)
+        return json.dumps({"message": "ç·šãŒæ¤œå‡ºã•ã‚Œã¾ã›ã‚“ã§ã—ãŸã€‚"}, ensure_ascii=False)
     analysis = {}
     for line in lines:
         for x1, y1, x2, y2 in line:
             length = np.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
             if length > 150 and y1 > image.shape[0] // 2:
-                analysis[f"line_{x1}_{y1}_{x2}_{y2}"] = "à‰^ü: ŒoÏ“I‚ÈˆÀ’è‚Æ¬Œ÷‚ğ¦´‚µ‚Ü‚·B"
+                analysis[f"line_{x1}_{y1}_{x2}_{y2}"] = "è²¡é‹ç·š: çµŒæ¸ˆçš„ãªå®‰å®šã¨æˆåŠŸã‚’ç¤ºå”†ã—ã¾ã™ã€‚"
             elif length > 100:
-                analysis[f"line_{x1}_{y1}_{x2}_{y2}"] = "’†’ö“x‚Ìà‰^ü: à­“I‚È¬’·‚Ì‰Â”\«‚ª‚ ‚è‚Ü‚·‚ªA’ˆÓ‚ª•K—v‚Å‚·B"
+                analysis[f"line_{x1}_{y1}_{x2}_{y2}"] = "ä¸­ç¨‹åº¦ã®è²¡é‹ç·š: è²¡æ”¿çš„ãªæˆé•·ã®å¯èƒ½æ€§ãŒã‚ã‚Šã¾ã™ãŒã€æ³¨æ„ãŒå¿…è¦ã§ã™ã€‚"
             else:
-                analysis[f"line_{x1}_{y1}_{x2}_{y2}"] = "’Z‚¢à‰^ü: à­“I‚ÈƒŠƒXƒN‚â¢“ï‚ª—\‘ª‚³‚ê‚Ü‚·B"
+                analysis[f"line_{x1}_{y1}_{x2}_{y2}"] = "çŸ­ã„è²¡é‹ç·š: è²¡æ”¿çš„ãªãƒªã‚¹ã‚¯ã‚„å›°é›£ãŒäºˆæ¸¬ã•ã‚Œã¾ã™ã€‚"
     return json.dumps(analysis, ensure_ascii=False)
 
-# —öˆ¤‚âo‰ï‚¢‚ÉŠÖ‚·‚é‰ğÍ
+# æ‹æ„›ã‚„å‡ºä¼šã„ã«é–¢ã™ã‚‹è§£æ
 def analyze_love_palmistry(lines):
     if lines is None:
-        return json.dumps({"message": "ü‚ªŒŸo‚³‚ê‚Ü‚¹‚ñ‚Å‚µ‚½B"}, ensure_ascii=False)
+        return json.dumps({"message": "ç·šãŒæ¤œå‡ºã•ã‚Œã¾ã›ã‚“ã§ã—ãŸã€‚"}, ensure_ascii=False)
     analysis = {}
     for line in lines:
         for x1, y1, x2, y2 in line:
             length = np.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
             if y1 < image.shape[0] // 3:
                 if length > 100:
-                    analysis[f"line_{x1}_{y1}_{x2}_{y2}"] = "’·‚¢Š´îü: [‚¢ˆ¤î‚ÆˆÀ’è‚µ‚½ŠÖŒW‚ğ¦´‚µ‚Ü‚·B"
+                    analysis[f"line_{x1}_{y1}_{x2}_{y2}"] = "é•·ã„æ„Ÿæƒ…ç·š: æ·±ã„æ„›æƒ…ã¨å®‰å®šã—ãŸé–¢ä¿‚ã‚’ç¤ºå”†ã—ã¾ã™ã€‚"
                 else:
-                    analysis[f"line_{x1}_{y1}_{x2}_{y2}"] = "’Z‚¢Š´îü: —öˆ¤‚É‚¨‚¯‚é’ˆÓ‚ª•K—v‚Å‚·B"
+                    analysis[f"line_{x1}_{y1}_{x2}_{y2}"] = "çŸ­ã„æ„Ÿæƒ…ç·š: æ‹æ„›ã«ãŠã‘ã‚‹æ³¨æ„ãŒå¿…è¦ã§ã™ã€‚"
             elif y1 >= image.shape[0] // 3 and y1 < image.shape[0] * 2 // 3:
-                analysis[f"line_{x1}_{y1}_{x2}_{y2}"] = "Œ‹¥ü: o‰ï‚¢‚âŒ‹¥‚ÉŠÖ‚·‚éd—v‚È’›Œó‚ğ¦‚µ‚Ä‚¢‚Ü‚·B"
+                analysis[f"line_{x1}_{y1}_{x2}_{y2}"] = "çµå©šç·š: å‡ºä¼šã„ã‚„çµå©šã«é–¢ã™ã‚‹é‡è¦ãªå…†å€™ã‚’ç¤ºã—ã¦ã„ã¾ã™ã€‚"
             else:
-                analysis[f"line_{x1}_{y1}_{x2}_{y2}"] = "ˆ¤îü: ‹­‚¢—öˆ¤‰^‚ğ¦´‚µ‚Ü‚·B"
+                analysis[f"line_{x1}_{y1}_{x2}_{y2}"] = "æ„›æƒ…ç·š: å¼·ã„æ‹æ„›é‹ã‚’ç¤ºå”†ã—ã¾ã™ã€‚"
     return json.dumps(analysis, ensure_ascii=False)
 
-# lŠÔŠÖŒW‚ÉŠÖ‚·‚é‰ğÍ
+# äººé–“é–¢ä¿‚ã«é–¢ã™ã‚‹è§£æ
 def analyze_relationship_palmistry(lines):
     if lines is None:
-        return json.dumps({"message": "ü‚ªŒŸo‚³‚ê‚Ü‚¹‚ñ‚Å‚µ‚½B"}, ensure_ascii=False)
+        return json.dumps({"message": "ç·šãŒæ¤œå‡ºã•ã‚Œã¾ã›ã‚“ã§ã—ãŸã€‚"}, ensure_ascii=False)
     analysis = {}
     for line in lines:
         for x1, y1, x2, y2 in line:
             length = np.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
             if y1 > image.shape[0] // 2 and length > 100:
-                analysis[f"line_{x1}_{y1}_{x2}_{y2}"] = "—Fîü: [‚¢—Fî‚âM—Š‚Å‚«‚élŠÔŠÖŒW‚ğ’z‚­—Í‚ğ¦´‚µ‚Ü‚·B"
+                analysis[f"line_{x1}_{y1}_{x2}_{y2}"] = "å‹æƒ…ç·š: æ·±ã„å‹æƒ…ã‚„ä¿¡é ¼ã§ãã‚‹äººé–“é–¢ä¿‚ã‚’ç¯‰ãåŠ›ã‚’ç¤ºå”†ã—ã¾ã™ã€‚"
             elif y1 < image.shape[0] // 2 and length > 50:
-                analysis[f"line_{x1}_{y1}_{x2}_{y2}"] = "lŠÔŠÖŒW‚Ìü: ‘¼Ò‚Æ‚Ì‹­‚¢Œq‚ª‚è‚ğ‚ÂŒXŒü‚ª‚ ‚è‚Ü‚·B"
+                analysis[f"line_{x1}_{y1}_{x2}_{y2}"] = "äººé–“é–¢ä¿‚ã®ç·š: ä»–è€…ã¨ã®å¼·ã„ç¹‹ãŒã‚Šã‚’æŒã¤å‚¾å‘ãŒã‚ã‚Šã¾ã™ã€‚"
             else:
-                analysis[f"line_{x1}_{y1}_{x2}_{y2}"] = "lŠÔŠÖŒW‚Ìü: ’²®‚ª•K—v‚Å‚·B"
+                analysis[f"line_{x1}_{y1}_{x2}_{y2}"] = "äººé–“é–¢ä¿‚ã®ç·š: èª¿æ•´ãŒå¿…è¦ã§ã™ã€‚"
     return json.dumps(analysis, ensure_ascii=False)
 
 if __name__ == '__main__':
-    # ƒAƒbƒvƒ[ƒhƒtƒHƒ‹ƒ_‚Ìì¬
+    # ã‚¢ãƒƒãƒ—ãƒ­ãƒ¼ãƒ‰ãƒ•ã‚©ãƒ«ãƒ€ã®ä½œæˆ
     if not os.path.exists(app.config['UPLOAD_FOLDER']):
         os.makedirs(app.config['UPLOAD_FOLDER'])
     if not os.path.exists(app.config['SHARE_FOLDER']):
         os.makedirs(app.config['SHARE_FOLDER'])
     
-    # ƒAƒvƒŠƒP[ƒVƒ‡ƒ“‚ÌÀs
-	app.run(host='0.0.0.0', port=10000)
-	
+    # ã‚¢ãƒ—ãƒªã‚±ãƒ¼ã‚·ãƒ§ãƒ³ã®å®Ÿè¡Œ
+    port = int(os.environ.get('PORT', 10000))
+    app.run(host='0.0.0.0', port=port)
